@@ -5,7 +5,7 @@ pipeline {
         maven 'Maven3'  
     }
     
-    stages {
+    stages{
         
         stage('Checkout') {
             steps {
@@ -28,12 +28,6 @@ pipeline {
         stage('Package') {
             steps {
                 sh 'mvn package'
-            }
-        }
-
-        stage('Build') {
-            steps {
-                sh 'printenv'
             }
         }
 
