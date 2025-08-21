@@ -31,7 +31,7 @@ pipeline {
             }
         }
 
-        sstage('ECR Login') {
+        stage('ECR Login') {
             steps {
                 sh '''
                   aws ecr get-login-password --region us-east-1 \
@@ -39,7 +39,7 @@ pipeline {
                 '''
             }
         }
-        
+
         stage('Build & Push Docker Image') {
             steps {
                 sh '''
