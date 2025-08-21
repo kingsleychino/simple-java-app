@@ -34,7 +34,7 @@ pipeline {
         stage('Publish ECR') {
             steps {
                 withEnv (["AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}", "AWS_SECRET_ACCESS_KEY=${env.AWS_SECRETE_ACCESS_KEY}", "AWS_DEFAULT_REGION=${env.AWS_DEFAULT_REGION}"]) {
-                    sh 'docker login -u AWS -p $(aws ecr_public get-login-password --region us-east-1) 503499294473.dkr.ecr.us-east-1.amazonaws.com'
+                    sh 'docker login -u aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 503499294473.dkr.ecr.us-east-1.amazonaws.com'
                     sh 'docker build -t simple-java-app .'
                     sh 'docker tag simple-java-app:""$BUILD_ID""'
                     sh 'docker push 503499294473.dkr.ecr.us-east-1.amazonaws.com/simple-java-app:""BUILD_ID""'
