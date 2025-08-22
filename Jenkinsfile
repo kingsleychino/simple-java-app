@@ -38,7 +38,7 @@ pipeline {
                     sh 'docker login -u AWS -p $(aws ecr_public get-login-password --region us-east-1) public.ecr.aws/a4g8l0d7'
                     sh 'docker build -t ecr-demoing .'
                     sh 'docker tag ecr-demoing:""$BUILD_ID""'
-                    sh 'docker push public.ecr.aws/a4g8l0d7/ecr-demoing:""BUILD_ID""'
+                    sh 'docker push public.ecr.aws/a4g8l0d7/ecr-demoing:""$BUILD_ID""'
                 }
             }
         }
