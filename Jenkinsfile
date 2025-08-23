@@ -7,37 +7,10 @@ pipeline {
     
     stages{
         
-        stage('Checkout') {
+        stage('Build maven') {
             steps {
-                git branch: 'main', url: 'https://github.com/kingsleychino/simple-java-app.git'
-            }
-        }
-        
-        stage('Build') {
-            steps {
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/kingsleychino/simple-java-app']])
                 sh 'mvn clean install'
-                sh 'printenv'
-            }
-        }
-        
-        stage('Test') {
-            steps {
-                sh 'mvn test'
-            }
-        }
-        
-        stage('Package') {
-            steps {
-                sh 'mvn package'
-            }
-        }
-
-        stage('Publish ECR') {
-            steps {
-                sh 'aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/a4g8l0d7'
-                sh 'docker build -t ecr-demoing .'
-                sh 'docker tag ecr-demoing:latest public.ecr.aws/a4g8l0d7/ecr-demoing:””$BUILD_ID""'
-                sh 'docker push public.ecr.aws/a4g8l0d7/ecr-demoing:""$BUILD_ID""'
             }
         }
         
