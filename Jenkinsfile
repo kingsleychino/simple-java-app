@@ -17,7 +17,7 @@ pipeline {
         stage('Build docker image') {
             steps {
                 script {
-                    sh 'docker build -t simple-java-app-private .'
+                    sh 'docker build -t simple_java_app .'
                 }
             }
         }
@@ -26,8 +26,8 @@ pipeline {
             steps {
                 sh '''
                     aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 503499294473.dkr.ecr.us-east-1.amazonaws.com
-                    docker tag simple-java-app-private:latest 503499294473.dkr.ecr.us-east-1.amazonaws.com/simple-java-app-private:latest
-                    docker push 503499294473.dkr.ecr.us-east-1.amazonaws.com/simple-java-app-private:latest
+                    docker tag simple_java_app:latest 503499294473.dkr.ecr.us-east-1.amazonaws.com/simple_java_app:latest
+                    docker push 503499294473.dkr.ecr.us-east-1.amazonaws.com/simple_java_app:latest
                 '''
             }
         }
