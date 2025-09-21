@@ -17,6 +17,7 @@ pipeline {
             steps {
                 script {
                     sh 'docker build -t simple-java-app .'
+                }
             }
         }
 
