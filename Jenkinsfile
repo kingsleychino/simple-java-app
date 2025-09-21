@@ -6,9 +6,10 @@ pipeline {
     }
 
     stages {
-        stage('Hello') {
+        stage('Build Maven') {
             steps {
-                echo 'Hello World'
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/kingsleychino/simple-java-app']])
+                sh 'maven clean install'
             }
         }
     }
