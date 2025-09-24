@@ -21,7 +21,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh 'docker build -t simple-java-app .'
+                    sh 'docker build -t $DOCKERIMAGE:$VERSION .'
                 }
             }
         }
