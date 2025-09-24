@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_ADDRESS = "503499294473.dkr.ecr.us-east-1.amazonaws.com"
-        DOCKER_IMAGE   = "simple-java-app"
+        DOCKER_IMAGE   = "java-app"
         VERSION        = "v1.${BUILD_NUMBER}"
     }
 
