@@ -2,7 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKERIMAGE = 503499294473.dkr.ecr.us-east-1.amazonaws.com/simple-java-app:
+        DOCKER_ADDRESS = 503499294473.dkr.ecr.us-east-1.amazonaws.com
+        DOCKER_IMAGE = simple-java-app:
         VERSION = "v1.${BUILD_NUMBER}"
     }
 
@@ -21,7 +22,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh 'docker build -t $DOCKERIMAGE:$VERSION .'
+                    sh 'docker build -t $DOCKER_IMAGE:$VERSION .'
                 }
             }
         }
@@ -30,8 +31,8 @@ pipeline {
             steps {
                 sh '''
                     aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 503499294473.dkr.ecr.us-east-1.amazonaws.com
-                    docker tag $DOCKERIMAGE:$VERSION $DOCKERIMAGE:$VERSION
-                    docker push $DOCKERIMAGE:$VERSION
+                    docker tag $DOCKER_IMAGE:$VERSION $DOCKER_ADDRESS/$DOCKER_IMAGE:$VERSION
+                    docker push $DOCKER_ADDRESS/$DOCKER_IMAGE:$VERSION
                 '''
             }
         }
