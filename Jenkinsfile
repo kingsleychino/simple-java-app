@@ -14,11 +14,7 @@ pipeline {
     stages {
         stage('Build Maven') {
             steps {
-                checkout scmGit(
-                    branches: [[name: '*/main']],
-                    extensions: [],
-                    userRemoteConfigs: [[url: 'https://github.com/kingsleychino/simple-java-app']]
-                )
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/kingsleychino/simple-java-app']])
                 sh 'mvn clean install'
             }
         }
