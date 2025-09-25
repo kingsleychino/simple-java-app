@@ -1,5 +1,5 @@
 # Use a lightweight Java runtime as base
-FROM openjdk:17-jdk-slim
+FROM public.ecr.aws/amazoncorretto/amazoncorretto:17-alpine
 
 # Set working directory
 WORKDIR /app
