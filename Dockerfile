@@ -5,7 +5,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Copy the built JAR file into the container
-COPY target/app.jar /app/app.jar
+COPY target/spring-boot-docker-demo-0.0.1-SNAPSHOT.jar /app/app.jar
 
 # Expose the port your Spring Boot application listens on (default is 8080)
 EXPOSE 8080
