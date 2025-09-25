@@ -1,14 +1,30 @@
-# Use a base image with Java installed (e.g., OpenJDK 17)
-FROM openjdk:17-jdk-slim
+# # Use a base image with Java installed (e.g., OpenJDK 17)
+# FROM openjdk:17-jdk-slim
 
-# Set the working directory inside the container
+# # Set the working directory inside the container
+# WORKDIR /app
+
+# # Copy the built JAR file into the container
+# COPY target/spring-boot-docker-demo-0.0.1-SNAPSHOT.jar /app/app.jar
+
+# # Expose the port your Spring Boot application listens on (default is 8080)
+# EXPOSE 8080
+
+# # Define the command to run the application when the container starts
+# ENTRYPOINT ["java", "-jar", "app.jar"]
+
+
+# Use lightweight Java runtime
+FROM amazoncorretto:17-alpine
+
+# Set working directory
 WORKDIR /app
 
-# Copy the built JAR file into the container
-COPY target/spring-boot-docker-demo-0.0.1-SNAPSHOT.jar /app/app.jar
+# Copy pre-built JAR into container
+COPY target/app.jar /app/app.jar
 
-# Expose the port your Spring Boot application listens on (default is 8080)
+# Expose Spring Boot port
 EXPOSE 8080
 
-# Define the command to run the application when the container starts
+# Run Spring Boot
 ENTRYPOINT ["java", "-jar", "app.jar"]
