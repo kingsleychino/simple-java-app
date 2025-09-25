@@ -1,14 +1,14 @@
-# 1️⃣ Use Amazon Corretto 17 (AWS Public ECR, lightweight)
-FROM public.ecr.aws/amazoncorretto/amazoncorretto:17-alpine
+# Use a base image with Java installed (e.g., OpenJDK 17)
+FROM openjdk:17-jdk-slim
 
-# 2️⃣ Set working directory
+# Set the working directory inside the container
 WORKDIR /app
 
-# 3️⃣ Copy your compiled JAR
+# Copy the built JAR file into the container
 COPY target/app.jar /app/app.jar
 
-# 4️⃣ Expose the port your app listens on
+# Expose the port your Spring Boot application listens on (default is 8080)
 EXPOSE 8080
 
-# 5️⃣ Run the Java app
+# Define the command to run the application when the container starts
 ENTRYPOINT ["java", "-jar", "app.jar"]
