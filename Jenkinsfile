@@ -51,10 +51,10 @@ pipeline {
             steps {
                 sh '''
                     aws ecs update-service \
-                        --cluster cs-fargate-cluster \
-                        --service java-app-service \
-                        --force-new-deployment \
-                        --region us-east-1
+                      --cluster ecs-fargate-cluster \
+                      --service java-app-service \
+                      --force-new-deployment \
+                      --region us-east-1
                 '''
             }
         }
