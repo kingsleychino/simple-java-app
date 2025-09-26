@@ -46,5 +46,14 @@ pipeline {
                 """
             }
         }
+
+        stage('Deploy to ECS') {
+            steps {
+                sh '''
+                    aws ecs update-service \
+                        --cluster app-cluster \
+                        --service java-app-service \
+                        --force-new-deploy
+                '''
     }
 }
