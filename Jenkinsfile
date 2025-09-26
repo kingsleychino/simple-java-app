@@ -56,5 +56,6 @@ pipeline {
                         --force-new-deploy
                 '''
             }
+        }
     }
 }
