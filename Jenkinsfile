@@ -50,6 +50,9 @@ pipeline {
         stage('Deploy to ECS') {
             steps {
                 sh '''
+                    set -e
+                    set -x
+                    
                     aws ecs update-service \
                       --cluster ecs-fargate-cluster \
                       --service java-app-service \
