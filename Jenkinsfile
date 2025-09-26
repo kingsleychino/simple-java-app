@@ -51,8 +51,8 @@ pipeline {
             steps {
                 sh '''
                     aws ecs update-service \
-                        --cluster app-cluster \
-                        --service java-app-service \
+                        --cluster cs-fargate-cluster-cluster \
+                        --service cs-fargate-cluster-service \
                         --force-new-deploy
                 '''
             }
