@@ -55,5 +55,6 @@ pipeline {
                         --service java-app-service \
                         --force-new-deploy
                 '''
+            }
     }
 }
