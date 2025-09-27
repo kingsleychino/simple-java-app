@@ -24,28 +24,28 @@ pipeline {
                 )
             }
         }
+        
+        // stage('Build Maven') {
+        //     steps {
+        //         sh 'mvn clean install'
+        //     }
+        // }
 
-        stage('Build Maven') {
-            steps {
-                sh 'mvn clean install'
-            }
-        }
+        // stage('Build Docker Image') {
+        //     steps {
+        //         sh "docker build -t ${DOCKER_IMAGE}:${VERSION} ."
+        //     }
+        // }
 
-        stage('Build Docker Image') {
-            steps {
-                sh "docker build -t ${DOCKER_IMAGE}:${VERSION} ."
-            }
-        }
-
-        stage('Tag & Push to ECR') {
-            steps {
-                sh """
-                    aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${DOCKER_ADDRESS}
-                    docker tag ${DOCKER_IMAGE}:${VERSION} ${FULL_IMAGE}
-                    docker push ${FULL_IMAGE}
-                """
-            }
-        }
+        // stage('Tag & Push to ECR') {
+        //     steps {
+        //         sh """
+        //             aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${DOCKER_ADDRESS}
+        //             docker tag ${DOCKER_IMAGE}:${VERSION} ${FULL_IMAGE}
+        //             docker push ${FULL_IMAGE}
+        //         """
+        //     }
+        // }
 
         stage('Deploy to ECS') {
             steps {
