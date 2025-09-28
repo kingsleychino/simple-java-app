@@ -5,7 +5,7 @@ pipeline {
         AWS_REGION   = "us-east-1"
         ECR_REPO     = "503499294473.dkr.ecr.us-east-1.amazonaws.com/simple-java-app"
         APP_NAME     = "simple-java-app"
-        TF_DIR       = "terraform"   // change to "." if tf files are in repo root
+        TF_DIR       = "."
     }
 
     stages {
