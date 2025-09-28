@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        AWS_REGION   = "us-east-1"
-        ECR_REPO     = "503499294473.dkr.ecr.us-east-1.amazonaws.com/simple-java-app"
+        AWS_REGION    = "us-east-1"
+        ECR_REPO      = "503499294473.dkr.ecr.us-east-1.amazonaws.com/simple-java-app"
         TERRAFORM_DIR = "/var/lib/jenkins/workspace/simple-java-pipeline/terraform"
     }
 
@@ -17,7 +17,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    IMAGE_TAG = "build-${env.BUILD_NUMBER}"
+                    env.IMAGE_TAG = "build-${env.BUILD_NUMBER}"  // ✅ store in env so it's global
                     sh """
                         aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
                         docker build -t $ECR_REPO:$IMAGE_TAG .
@@ -29,9 +29,7 @@ pipeline {
         stage('Push Docker Image to ECR') {
             steps {
                 script {
-                    sh """
-                        docker push $ECR_REPO:$IMAGE_TAG
-                    """
+                    sh "docker push $ECR_REPO:$IMAGE_TAG"
                 }
             }
         }
@@ -42,7 +40,9 @@ pipeline {
                     script {
                         sh """
                             terraform init -input=false
-                            terraform apply -auto-approve -var="image_tag=$IMAGE_TAG"
+                            terraform apply -auto-approve \
+                                -var="image_tag=$IMAGE_TAG" \
+                                -var="ecr_repo_url=$ECR_REPO"
                         """
                     }
                 }
@@ -50,4 +50,3 @@ pipeline {
         }
     }
 }
-
