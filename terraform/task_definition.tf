@@ -1,11 +1,15 @@
-variable "image_tag" {
-  description = "ECR image tag"
+variable "ecr_repo_url" {
   type        = string
-  default     = "latest" # optional fallback
+  description = "ECR repo URL"
+}
+
+variable "image_tag" {
+  type        = string
+  description = "Docker image tag"
 }
 
 resource "aws_ecs_task_definition" "java_app" {
-  family                   = "java-app-task"
+  family                   = "java-app"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = "256"
@@ -14,19 +18,18 @@ resource "aws_ecs_task_definition" "java_app" {
 
   container_definitions = jsonencode([{
     name      = "java-app-container"
-    image     = "${aws_ecr_repository.app_repo.repository_url}:${var.image_tag}"
+    image     = "${var.ecr_repo_url}:${var.image_tag}"   # ✅ dynamic
     essential = true
     portMappings = [{
       containerPort = 8080
       hostPort      = 8080
-      protocol      = "tcp"
     }]
     logConfiguration = {
       logDriver = "awslogs"
       options = {
-        "awslogs-group"         = "/ecs/java-app"
-        "awslogs-region"        = "us-east-1"
-        "awslogs-stream-prefix" = "ecs"
+        awslogs-group         = "/ecs/java-app"
+        awslogs-region        = var.region
+        awslogs-stream-prefix = "ecs"
       }
     }
   }])
