@@ -40,7 +40,8 @@ pipeline {
                         terraform init -input=false
                         terraform apply -auto-approve \
                             -var="image_tag=$IMAGE_TAG" \
-                            -var="ecr_repo_url=$ECR_REPO"
+                            -var="ecr_repo_url=$ECR_REPO" \
+                            -var="region=$AWS_REGION"
                     """
                 }
             }
