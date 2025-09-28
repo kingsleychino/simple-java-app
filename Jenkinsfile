@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'docker terraform' }  // ✅ runs on your dedicated agent
+    //agent { label 'docker terraform' }  // ✅ runs on your dedicated agent
 
     environment {
         AWS_REGION    = "us-east-1"
