@@ -5,7 +5,7 @@ pipeline {
         AWS_REGION = "us-east-1"
         ECR_REPO   = "503499294473.dkr.ecr.us-east-1.amazonaws.com/simple-java-app"
         APP_NAME   = "simple-java-app"
-        TF_DIR     = "."
+        TF_DIR     = "terraform"
         IMAGE_TAG  = "build-${env.BUILD_NUMBER}"
     }
 
