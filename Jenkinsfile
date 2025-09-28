@@ -1,25 +1,78 @@
+// pipeline {
+//     agent any
+
+//     environment {
+//         AWS_REGION   = "us-east-1"
+//         ECR_REPO     = "503499294473.dkr.ecr.us-east-1.amazonaws.com/simple-java-app"
+//         TERRAFORM_DIR = "/var/lib/jenkins/workspace/simple-java-pipeline/terraform"
+//     }
+
+//     stages {
+//         stage('Checkout') {
+//             steps {
+//                 git branch: 'main', url: 'https://github.com/kingsleychino/simple-java-app.git'
+//             }
+//         }
+
+//         stage('Build Docker Image') {
+//             steps {
+//                 script {
+//                     IMAGE_TAG = "build-${env.BUILD_NUMBER}"
+//                     sh """
+//                         aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
+//                         docker build -t $ECR_REPO:$IMAGE_TAG .
+//                     """
+//                 }
+//             }
+//         }
+
+//         stage('Push Docker Image to ECR') {
+//             steps {
+//                 script {
+//                     sh """
+//                         docker push $ECR_REPO:$IMAGE_TAG
+//                     """
+//                 }
+//             }
+//         }
+
+//         stage('Terraform Init & Apply') {
+//             steps {
+//                 dir("${TERRAFORM_DIR}") {
+//                     script {
+//                         sh """
+//                             terraform init -input=false
+//                             terraform apply -auto-approve -var="image_tag=$IMAGE_TAG"
+//                         """
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// }
+
+
+
+
 pipeline {
     agent any
 
     environment {
-        AWS_REGION   = "us-east-1"
-        ECR_REPO     = "503499294473.dkr.ecr.us-east-1.amazonaws.com/simple-java-app"
+        AWS_REGION    = "us-east-1"
+        ECR_REPO      = "503499294473.dkr.ecr.us-east-1.amazonaws.com/simple-java-app"
         TERRAFORM_DIR = "/var/lib/jenkins/workspace/simple-java-pipeline/terraform"
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'main', url: 'https://github.com/kingsleychino/simple-java-app.git'
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 script {
                     IMAGE_TAG = "build-${env.BUILD_NUMBER}"
                     sh """
+                        echo "🔑 Logging into ECR..."
                         aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
+                        
+                        echo "🐳 Building Docker image with tag $IMAGE_TAG..."
                         docker build -t $ECR_REPO:$IMAGE_TAG .
                     """
                 }
@@ -30,6 +83,7 @@ pipeline {
             steps {
                 script {
                     sh """
+                        echo "📤 Pushing image to ECR..."
                         docker push $ECR_REPO:$IMAGE_TAG
                     """
                 }
@@ -41,7 +95,10 @@ pipeline {
                 dir("${TERRAFORM_DIR}") {
                     script {
                         sh """
+                            echo "⚙️ Initializing Terraform..."
                             terraform init -input=false
+                            
+                            echo "🚀 Applying Terraform with image_tag=$IMAGE_TAG..."
                             terraform apply -auto-approve -var="image_tag=$IMAGE_TAG"
                         """
                     }
@@ -50,3 +107,4 @@ pipeline {
         }
     }
 }
+
