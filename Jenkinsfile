@@ -2,10 +2,10 @@ pipeline {
     agent any
 
     environment {
-        TF_DIR = "terraform"
-        AWS_REGION    = "us-east-1"
-        ECR_REPO      = "503499294473.dkr.ecr.us-east-1.amazonaws.com/simple-java-app"
-        TERRAFORM_DIR = "/var/lib/jenkins/workspace/simple-java-app-pipeline"
+        AWS_REGION   = "us-east-1"
+        ECR_REPO     = "503499294473.dkr.ecr.us-east-1.amazonaws.com/simple-java-app"
+        APP_NAME     = "simple-java-app"
+        TF_DIR       = "terraform"   // change to "." if tf files are in repo root
     }
 
     stages {
@@ -15,37 +15,57 @@ pipeline {
             }
         }
 
+        stage('Build Jar') {
+            steps {
+                sh 'mvn clean package -DskipTests'
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
-                script {
-                    env.IMAGE_TAG = "build-${env.BUILD_NUMBER}"
-                    sh """
-                        aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
-                        docker build -t $ECR_REPO:$IMAGE_TAG .
-                    """
+                sh "docker build -t $ECR_REPO:latest ."
+            }
+        }
+
+        stage('Push to ECR') {
+            steps {
+                sh """
+                aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
+                docker push $ECR_REPO:latest
+                """
+            }
+        }
+
+        stage('Terraform Init') {
+            steps {
+                dir("${TF_DIR}") {
+                    sh "terraform init -input=false"
                 }
             }
         }
 
-        stage('Push Docker Image to ECR') {
+        stage('Terraform Apply') {
             steps {
-                sh "docker push $ECR_REPO:$IMAGE_TAG"
-            }
-        }
-
-        stage('Terraform Init & Apply') {
-            steps {
-                dir("${TERRAFORM_DIR}") {
-                    sh """
-                        terraform init -input=false
-                        terraform apply -auto-approve \
-                            -var="image_tag=$IMAGE_TAG" \
-                            -var="ecr_repo_url=$ECR_REPO" \
-                            -var="region=$AWS_REGION"
-                    """
+                dir("${TF_DIR}") {
+                    sh "terraform apply -auto-approve -input=false"
                 }
             }
         }
+
+        stage('Terraform Destroy (Optional)') {
+            when {
+                expression { return params.DESTROY == true }
+            }
+            steps {
+                dir("${TF_DIR}") {
+                    sh "terraform destroy -auto-approve -input=false"
+                }
+            }
+        }
+    }
+
+    parameters {
+        booleanParam(name: 'DESTROY', defaultValue: false, description: 'Destroy infrastructure instead of applying')
     }
 
     post {
@@ -54,4 +74,3 @@ pipeline {
         }
     }
 }
-
