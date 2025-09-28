@@ -1,4 +1,9 @@
 pipeline {
+    post {
+        always {
+            cleanWs()   // ✅ deletes workspace after every build
+        }
+    }
     agent { label 'docker terraform' }  // ✅ runs on your dedicated agent
 
     environment {
