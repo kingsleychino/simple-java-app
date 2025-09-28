@@ -1,8 +1,8 @@
 pipeline {
     agent any
-    //agent { label 'docker terraform' }  // ✅ runs on your dedicated agent
 
     environment {
+        TF_DIR = "terraform"
         AWS_REGION    = "us-east-1"
         ECR_REPO      = "503499294473.dkr.ecr.us-east-1.amazonaws.com/simple-java-app"
         TERRAFORM_DIR = "/var/lib/jenkins/workspace/simple-java-pipeline/terraform"
