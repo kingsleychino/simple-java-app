@@ -2,10 +2,11 @@ pipeline {
     agent any
 
     environment {
-        AWS_REGION   = "us-east-1"
-        ECR_REPO     = "503499294473.dkr.ecr.us-east-1.amazonaws.com/simple-java-app"
-        APP_NAME     = "simple-java-app"
-        TF_DIR       = "."
+        AWS_REGION = "us-east-1"
+        ECR_REPO   = "503499294473.dkr.ecr.us-east-1.amazonaws.com/simple-java-app"
+        APP_NAME   = "simple-java-app"
+        TF_DIR     = "."
+        IMAGE_TAG  = "build-${env.BUILD_NUMBER}"
     }
 
     stages {
@@ -23,7 +24,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t $ECR_REPO:latest ."
+                sh "docker build -t $ECR_REPO:${IMAGE_TAG} ."
             }
         }
 
@@ -31,7 +32,7 @@ pipeline {
             steps {
                 sh """
                 aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
-                docker push $ECR_REPO:latest
+                docker push $ECR_REPO:${IMAGE_TAG}
                 """
             }
         }
@@ -45,9 +46,17 @@ pipeline {
         }
 
         stage('Terraform Apply') {
+            when {
+                expression { return params.DESTROY == false }
+            }
             steps {
                 dir("${TF_DIR}") {
-                    sh "terraform apply -auto-approve -input=false"
+                    sh """
+                    terraform apply -auto-approve -input=false \
+                        -var=image_tag=${IMAGE_TAG} \
+                        -var=ecr_repo_url=${ECR_REPO} \
+                        -var=region=${AWS_REGION}
+                    """
                 }
             }
         }
@@ -57,8 +66,14 @@ pipeline {
                 expression { return params.DESTROY == true }
             }
             steps {
+                input message: "Are you sure you want to destroy all infrastructure?", ok: "Yes, destroy"
                 dir("${TF_DIR}") {
-                    sh "terraform destroy -auto-approve -input=false"
+                    sh """
+                    terraform destroy -auto-approve -input=false \
+                        -var=image_tag=${IMAGE_TAG} \
+                        -var=ecr_repo_url=${ECR_REPO} \
+                        -var=region=${AWS_REGION}
+                    """
                 }
             }
         }
@@ -70,7 +85,7 @@ pipeline {
 
     post {
         always {
-            cleanWs()   // ✅ deletes workspace after every build
+            cleanWs()
         }
     }
 }
