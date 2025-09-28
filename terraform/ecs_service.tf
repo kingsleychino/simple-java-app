@@ -1,4 +1,4 @@
-resource "aws_ecs_service" "java_service" {
+resource "aws_ecs_service" "java_app_service" {
   name            = "java-app-service"
   cluster         = aws_ecs_cluster.java_app_cluster.id
   task_definition = aws_ecs_task_definition.java_app.arn
@@ -17,15 +17,5 @@ resource "aws_ecs_service" "java_service" {
     container_port   = 8080
   }
 
-  deployment_controller {
-    type = "ECS"
-  }
-
-  lifecycle {
-    ignore_changes = [task_definition]
-  }
-
-  triggers = {
-    redeploy = timestamp()
-  }
+  depends_on = [aws_lb_listener.http]
 }
