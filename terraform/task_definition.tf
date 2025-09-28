@@ -1,13 +1,3 @@
-variable "ecr_repo_url" {
-  type        = string
-  description = "ECR repo URL"
-}
-
-variable "image_tag" {
-  type        = string
-  description = "Docker image tag"
-}
-
 resource "aws_ecs_task_definition" "java_app" {
   family                   = "java-app"
   network_mode             = "awsvpc"
