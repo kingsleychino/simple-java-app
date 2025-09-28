@@ -1,4 +1,5 @@
 pipeline {
+    agent any
     //agent { label 'docker terraform' }  // ✅ runs on your dedicated agent
 
     environment {
