@@ -58,3 +58,15 @@ resource "aws_ecs_service" "app_service" {
 
   depends_on = [aws_lb_listener.app_listener]
 }
+
+
+resource "aws_cloudwatch_log_group" "ecs_java_app" {
+  name              = "/ecs/java-app"
+  retention_in_days = 7
+
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes  = [name]
+  }
+}
+
