@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/kingsleychino/simple-java-app.git'
+                git branch: 'main', url: 'https://github.com/kingsleychino/simple-java-app.git'
             }
         }
 
