@@ -4,7 +4,7 @@ pipeline {
     environment {
         AWS_REGION   = "us-east-1"
         ECR_REPO     = "503499294473.dkr.ecr.us-east-1.amazonaws.com/simple-java-app"
-        #TERRAFORM_DIR = "/var/lib/jenkins/workspace/simple-java-app/terraform"  // update to your path
+        TERRAFORM_DIR = "https://github.com/kingsleychino/simple-java-app"  // update to your path
     }
 
     stages {
