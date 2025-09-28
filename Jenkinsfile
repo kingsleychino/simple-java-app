@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { label 'docker terraform' }  // ✅ runs on your dedicated agent
 
     environment {
         AWS_REGION    = "us-east-1"
@@ -17,7 +17,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    env.IMAGE_TAG = "build-${env.BUILD_NUMBER}"  // ✅ store in env so it's global
+                    env.IMAGE_TAG = "build-${env.BUILD_NUMBER}"
                     sh """
                         aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
                         docker build -t $ECR_REPO:$IMAGE_TAG .
@@ -28,25 +28,22 @@ pipeline {
 
         stage('Push Docker Image to ECR') {
             steps {
-                script {
-                    sh "docker push $ECR_REPO:$IMAGE_TAG"
-                }
+                sh "docker push $ECR_REPO:$IMAGE_TAG"
             }
         }
 
         stage('Terraform Init & Apply') {
             steps {
                 dir("${TERRAFORM_DIR}") {
-                    script {
-                        sh """
-                            terraform init -input=false
-                            terraform apply -auto-approve \
-                                -var="image_tag=$IMAGE_TAG" \
-                                -var="ecr_repo_url=$ECR_REPO"
-                        """
-                    }
+                    sh """
+                        terraform init -input=false
+                        terraform apply -auto-approve \
+                            -var="image_tag=$IMAGE_TAG" \
+                            -var="ecr_repo_url=$ECR_REPO"
+                    """
                 }
             }
         }
     }
 }
+
