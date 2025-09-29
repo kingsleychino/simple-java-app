@@ -10,10 +10,9 @@ resource "aws_ecs_cluster" "app_cluster" {
 ############################################
 resource "aws_cloudwatch_log_group" "ecs_logs" {
   name              = "/ecs/java-app"
-  retention_in_days = 7
+  //retention_in_days = 7
 
   lifecycle {
-    prevent_destroy = true
     ignore_changes  = [name]
   }
 }
@@ -27,12 +26,13 @@ resource "aws_ecs_task_definition" "app_task" {
   requires_compatibilities = ["FARGATE"]
   cpu                      = "256"
   memory                   = "512"
-  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
+  execution_role_arn = data.aws_iam_role.ecs_task_execution_role.arn
 
   container_definitions = jsonencode([
     {
       name      = "java-app-container"
-      image     = "${var.ecr_repo_url}:${var.image_tag}"
+      image     = "503499294473.dkr.ecr.us-east-1.amazonaws.com/simple-java-app:build-8"
+      //image     = "${var.ecr_repo_url}:${var.image_tag}"
       essential = true
 
       portMappings = [
