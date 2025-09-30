@@ -17,40 +17,31 @@ resource "aws_cloudwatch_log_group" "ecs_logs" {
 ############################################
 # ECS Task Definition
 ############################################
-resource "aws_ecs_task_definition" "app_task" {
+resource "aws_ecs_task_definition" "app" {
   family                   = "java-app"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = "256"
   memory                   = "512"
-  execution_role_arn       = data.aws_iam_role.ecs_task_execution_role.arn
+  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
 
-  container_definitions = jsonencode([
-    {
-      name = "java-app-container"
-      image     = "503499294473.dkr.ecr.us-east-1.amazonaws.com/simple-java-app:build-14"
-      //image     = "${var.ecr_repo_url}:${var.image_tag}"
-      //image     = "${aws_ecr_repository.app_repo.repository_url}:${var.image_tag}"
-      essential = true
-
-      portMappings = [
-        {
-          containerPort = 8080
-          hostPort      = 8080
-          protocol      = "tcp"
-        }
-      ]
-
-      logConfiguration = {
-        logDriver = "awslogs",
-        options = {
-          awslogs-group         = aws_cloudwatch_log_group.ecs_logs.name
-          awslogs-region        = var.region
-          awslogs-stream-prefix = "ecs"
-        }
+  container_definitions = jsonencode([{
+    name      = "java-app-container"
+    image     = "${aws_ecr_repository.app_repo.repository_url}:${var.image_tag}"
+    essential = true
+    portMappings = [{
+      containerPort = 8080
+      hostPort      = 8080
+    }]
+    logConfiguration = {
+      logDriver = "awslogs"
+      options = {
+        awslogs-group         = "/ecs/java-app"
+        awslogs-region        = var.aws_region
+        awslogs-stream-prefix = "ecs"
       }
     }
-  ])
+  }])
 }
 
 ############################################
