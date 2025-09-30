@@ -18,7 +18,7 @@ pipeline {
             }
         }
 
-        /***
+        
         stage('Build Docker Image') {
             steps {
                 script {
@@ -53,7 +53,7 @@ pipeline {
                     """
                 }
             }
-        } ***/
+        } 
 
         stage('Terraform Init') {
             steps {
@@ -104,6 +104,21 @@ pipeline {
                 }
             }
         }
+
+        stage('Get ALB DNS') {
+            steps {
+                dir("${TERRAFORM_DIR}") {
+                    script {
+                        def alb_dns = sh(
+                            script: "terraform output -raw alb_dns",
+                            returnStdout: true
+                        ).trim()
+                        echo "🌐 App is available at: http://${alb_dns}"
+                    }
+                }
+        }
+    }
+
     }
 
     parameters {
@@ -112,7 +127,8 @@ pipeline {
 
     post {
         always {
-            echo "🏁 Pipeline finished."
+            cleanWs()
+            echo "🏁 Pipeline finished and workspace cleaned."
         }
     }
 }
