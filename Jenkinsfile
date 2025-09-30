@@ -15,7 +15,7 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/kingsleychino/simple-java-app.git'
             }
         }
-        /***
+        
         stage('Build Docker Image') {
             steps {
                 sh "docker build -t $ECR_REPO:${IMAGE_TAG} ."
@@ -29,7 +29,7 @@ pipeline {
                 docker push $ECR_REPO:${IMAGE_TAG}
                 """
             }
-        }  ***/
+        }
 
         stage('Terraform Init') {
             steps {
