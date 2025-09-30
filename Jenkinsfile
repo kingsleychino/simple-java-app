@@ -18,7 +18,6 @@ pipeline {
             }
         }
 
-        
         stage('Build Docker Image') {
             steps {
                 script {
@@ -116,9 +115,8 @@ pipeline {
                         echo "🌐 App is available at: http://${alb_dns}"
                     }
                 }
+            }
         }
-    }
-
     }
 
     parameters {
