@@ -10,12 +10,9 @@ resource "aws_ecs_cluster" "app_cluster" {
 ############################################
 resource "aws_cloudwatch_log_group" "ecs_logs" {
   name              = "/ecs/java-app"
-  //retention_in_days = 7
-
-  lifecycle {
-    ignore_changes  = [name]
-  }
+  retention_in_days = 7
 }
+
 
 ############################################
 # ECS Task Definition
@@ -65,10 +62,12 @@ resource "aws_ecs_service" "app_service" {
   launch_type     = "FARGATE"
   desired_count   = 1
 
+  
+
   network_configuration {
     subnets          = [aws_subnet.public_a.id, aws_subnet.public_b.id]
     assign_public_ip = true
-    security_groups  = [aws_security_group.alb_sg.id]
+    security_groups  = [aws_security_group.ecs_sg.id]
   }
 
   load_balancer {
