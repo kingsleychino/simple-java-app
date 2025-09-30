@@ -17,7 +17,7 @@ pipeline {
                 )
             }
         }
-
+/***
         stage('Build Docker Image') {
             steps {
                 script {
@@ -53,7 +53,7 @@ pipeline {
                 }
             }
         } 
-
+***/
         stage('Terraform Init') {
             steps {
                 dir("${TERRAFORM_DIR}") {
