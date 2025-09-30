@@ -4,14 +4,17 @@ pipeline {
     environment {
         AWS_REGION    = "us-east-1"
         ECR_REPO      = "503499294473.dkr.ecr.${AWS_REGION}.amazonaws.com/simple-java-app"
-        IMAGE_TAG     = "build-${BUILD_NUMBER}"     // unique image tag for each build
-        TERRAFORM_DIR = "./terraform"              // path to your .tf files
+        IMAGE_TAG     = "build-${BUILD_NUMBER}"   // unique tag per build
+        TERRAFORM_DIR = "./terraform"            // path to your .tf directory
     }
 
     stages {
-        stage('Checkout Source Code') {
+        stage('Checkout Code') {
             steps {
-                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/kingsleychino/simple-java-app']])
+                checkout scmGit(
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[url: 'https://github.com/kingsleychino/simple-java-app']]
+                )
             }
         }
 
@@ -19,7 +22,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                    echo '🔨 Building Docker image...'
+                    echo "🔨 Building Docker image..."
                     docker build -t ${ECR_REPO}:${IMAGE_TAG} .
                     docker tag ${ECR_REPO}:${IMAGE_TAG} ${ECR_REPO}:latest
                     """
@@ -31,19 +34,19 @@ pipeline {
             steps {
                 script {
                     sh """
-                    echo '🔑 Logging into Amazon ECR...'
+                    echo "🔐 Logging in to ECR..."
                     aws ecr get-login-password --region ${AWS_REGION} | \
-                        docker login --username AWS --password-stdin ${ECR_REPO}
+                    docker login --username AWS --password-stdin ${ECR_REPO}
                     """
                 }
             }
         }
 
-        stage('Push Image to ECR') {
+        stage('Push Docker Image to ECR') {
             steps {
                 script {
                     sh """
-                    echo '📤 Pushing image to ECR...'
+                    echo "📤 Pushing Docker image to ECR..."
                     docker push ${ECR_REPO}:${IMAGE_TAG}
                     docker push ${ECR_REPO}:latest
                     """
@@ -56,7 +59,7 @@ pipeline {
                 dir("${TERRAFORM_DIR}") {
                     script {
                         sh """
-                        echo '📦 Initializing Terraform...'
+                        echo "⚙️ Initializing Terraform..."
                         terraform init -input=false
                         """
                     }
@@ -69,7 +72,7 @@ pipeline {
                 dir("${TERRAFORM_DIR}") {
                     script {
                         sh """
-                        echo '🚀 Applying Terraform configuration...'
+                        echo "🚀 Applying Terraform deployment..."
                         terraform apply -auto-approve -var="image_tag=${IMAGE_TAG}"
                         """
                     }
@@ -77,15 +80,23 @@ pipeline {
             }
         }
 
-        stage('Terraform Destroy (Optional)') {
+        stage('Verify Deployment (Optional)') {
+            steps {
+                script {
+                    echo "✅ Deployment complete! ECS service should now be running with ${IMAGE_TAG}"
+                }
+            }
+        }
+
+        stage('Terraform Destroy (Manual)') {
             when {
-                expression { return params.DESTROY_INFRA == true }  // Only run if checkbox selected
+                expression { return params.DESTROY == true } // only if triggered manually
             }
             steps {
                 dir("${TERRAFORM_DIR}") {
                     script {
                         sh """
-                        echo '💣 Destroying Terraform resources...'
+                        echo "🔥 Destroying infrastructure..."
                         terraform destroy -auto-approve -var="image_tag=${IMAGE_TAG}"
                         """
                     }
@@ -95,12 +106,12 @@ pipeline {
     }
 
     parameters {
-        booleanParam(name: 'DESTROY_INFRA', defaultValue: false, description: 'Check to destroy infrastructure after deployment')
+        booleanParam(name: 'DESTROY', defaultValue: false, description: 'Check this to destroy infrastructure after deploy')
     }
 
     post {
         always {
-            echo '✅ Pipeline finished.'
+            echo "🏁 Pipeline finished."
         }
     }
 }
